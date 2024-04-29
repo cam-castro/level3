@@ -6,6 +6,7 @@
  */
 
 #include "raylib.h"
+#include <array>
 
 #include "model.h"
 
@@ -88,17 +89,34 @@ bool isSquareValid(Square square)
 
 void getValidMoves(GameModel &model, Moves &validMoves)
 {
-    // To-do: your code goes here...
+    Piece piece =
+        (getCurrentPlayer(model) == PLAYER_WHITE)
+        ? PIECE_BLACK
+        : PIECE_WHITE;
 
     for (int y = 0; y < BOARD_SIZE; y++)
         for (int x = 0; x < BOARD_SIZE; x++)
         {
-            Square move = {x, y};
+            //CONTRARIO
+            Square move = {x, y}, auxMove = move;
 
+            std::array<Square, 8> auxArray = { 
+                {{ auxMove.x, ++auxMove.y }, { ++auxMove.x, auxMove.y },
+                { auxMove.x, --auxMove.y }, { auxMove.x, --auxMove.y }, { --auxMove.x, auxMove.y },
+                { --auxMove.x, auxMove.y }, { auxMove.x, --auxMove.y }, { auxMove.x, --auxMove.y }}
+            };
+                
             // +++ TEST
             // Lists all empty squares...
-            if (getBoardPiece(model, move) == PIECE_EMPTY)
-                validMoves.push_back(move);
+            if(getBoardPiece(model, move) == PIECE_EMPTY )
+            {
+                for( auto i = auxArray.begin() ; i != auxArray.end() ; i++ )
+                {
+                    if (isSquareValid(*i) && getBoardPiece(model, *i) == piece)
+                        validMoves.push_back(move);
+
+                }
+            }
             // --- TEST
         }
 }
