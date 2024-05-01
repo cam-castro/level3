@@ -79,12 +79,32 @@ void setBoardPiece(GameModel &model, Square square, Piece piece)
     model.board[square.y][square.x] = piece;
 }
 
+
 bool isSquareValid(Square square)
 {
     return (square.x >= 0) &&
            (square.x < BOARD_SIZE) &&
            (square.y >= 0) &&
            (square.y < BOARD_SIZE);
+}
+
+bool analyseInDir(GameModel &model, Square square, Piece anPiece, const int dx, const int dy)
+{
+    if ( isSquareValid({ square.x + dx, square.y + dy}) && getBoardPiece(model, { square.x + dx, square.y + dy }) != PIECE_EMPTY 
+        && getBoardPiece(model, { square.x + dx, square.y + dy }) != anPiece)
+        for ( int i = dx, j = dy; isSquareValid({ square.x + i , square.y + j }) && 
+                getBoardPiece(model, { square.x + dx, square.y + dy }) != PIECE_EMPTY ; i += dx, j+= dy )
+            if (getBoardPiece(model, { square.x + i , square.y + j }) == anPiece)
+                return true;
+    
+    return false;
+}
+
+void flipInDir(GameModel &model, Square square, Piece toFlip, int dx, int dy)
+{
+    for ( int i = dx, j = dy; isSquareValid({ square.x + i , square.y + j }) && 
+        getBoardPiece(model, { square.x + i, square.y + j }) != toFlip; i += dx, j+= dy )
+        setBoardPiece(model, { square.x + i, square.y + j }, toFlip);
 }
 
 void getValidMoves(GameModel &model, Moves &validMoves)
@@ -107,81 +127,13 @@ void getValidMoves(GameModel &model, Moves &validMoves)
             // Lists all empty squares...
             if (getBoardPiece(model, move) == PIECE_EMPTY)
             {
-                bool flag = true;
+                bool flag = analyseInDir(model, move, selfPiece, -1, -1) || analyseInDir(model, move, selfPiece, -1, 0) ||
+                    analyseInDir(model, move, selfPiece, -1, 1) || analyseInDir(model, move, selfPiece, 0, -1) ||
+                    analyseInDir(model, move, selfPiece, 0, 1) || analyseInDir(model, move, selfPiece, 1, -1) ||
+                    analyseInDir(model, move, selfPiece, 1, 0) || analyseInDir(model, move, selfPiece, 1, 1);
 
-                // Vertical arriba
-                if (isSquareValid({ move.x, move.y + 1 }) && getBoardPiece(model, { move.x, move.y + 1 }) == oppPiece && flag)
-                    for (int i = move.y + 1 ; i < BOARD_SIZE && getBoardPiece(model, { move.x, i }) != PIECE_EMPTY; i++)
-                        if (isSquareValid({ move.x , i }) && getBoardPiece(model, { move.x , i }) == selfPiece)
-                        {
-                            validMoves.push_back(move);
-                            flag = false;
-                        }
-
-                // Diagonal arriba derecha
-                if (isSquareValid({ move.x + 1, move.y + 1 }) && getBoardPiece(model, { move.x + 1, move.y + 1 }) == oppPiece && flag)
-                    for (int i = 1; isSquareValid({ move.x + i , move.y + i }) && getBoardPiece(model, { move.x + i , move.y + i }) != PIECE_EMPTY; i++)
-                        if (getBoardPiece(model, { move.x + i , move.y + i }) == selfPiece)
-                        {
-                            validMoves.push_back(move);
-                            flag = false;
-                        }
-
-                // Horizontal derecha
-                if (isSquareValid({ move.x + 1, move.y }) && getBoardPiece(model, {move.x + 1, move.y}) == oppPiece && flag)
-                    for (int i = move.x + 1; i < BOARD_SIZE && getBoardPiece(model, {i, move.y}) != PIECE_EMPTY; i++)
-                        if (isSquareValid({ i , move.y }) && getBoardPiece(model, { i, move.y }) == selfPiece)
-                        {
-                            validMoves.push_back(move);
-                            flag = false;
-                        }
-
-
-                // Diagonal abajo derecha
-                if (isSquareValid({ move.x + 1, move.y - 1 }) && getBoardPiece(model, {move.x + 1, move.y - 1}) == oppPiece && flag)
-                    for (int i = 1; isSquareValid({ move.x + i , move.y - i }) && getBoardPiece(model, { move.x + i, move.y - i }) != PIECE_EMPTY; i++)
-                        if (getBoardPiece(model, { move.x + i , move.y - i }) == selfPiece)
-                        {
-                            validMoves.push_back(move);
-                            flag = false;
-                        }
-
-                // Vertical abajo
-                if (isSquareValid({ move.x, move.y - 1 }) && getBoardPiece(model, { move.x, move.y - 1}) == oppPiece && flag)
-                    for (int i = move.y - 1; i >= 0 && getBoardPiece(model, { move.x, i }) != PIECE_EMPTY; i--)
-                        if (isSquareValid({ move.x , i }) && getBoardPiece(model, { move.x , i }) == selfPiece)
-                        {
-                            validMoves.push_back(move);
-                            flag = false;
-                        }
-
-                // Diagonal abajo izquierda
-                if (isSquareValid({ move.x - 1, move.y - 1 }) && getBoardPiece(model, { move.x - 1, move.y - 1 }) == oppPiece && flag)
-                    for (int i = 1; isSquareValid({ move.x - i , move.y - i }) && getBoardPiece(model, { move.x - i , move.y - i }) != PIECE_EMPTY; i++)
-                        if (getBoardPiece(model, { move.x - i , move.y - i }) == selfPiece)
-                        {
-                            validMoves.push_back(move);
-                            flag = false;
-                        }
-
-                // Horizontal izquierda
-                if (isSquareValid({ move.x - 1, move.y }) && getBoardPiece(model, { move.x - 1, move.y }) == oppPiece && flag)
-                    for (int i = move.x - 1; i >= 0 && getBoardPiece(model, { i, move.y }) != PIECE_EMPTY; i--)
-                        if (isSquareValid({ i , move.y }) && getBoardPiece(model, { i, move.y }) == selfPiece)
-                        {
-                            validMoves.push_back(move);
-                            flag = false;
-                        }
-
-                // Diagonal arriba izquierda
-                if (isSquareValid({ move.x - 1, move.y + 1 }) && getBoardPiece(model, auxMove) == oppPiece && flag)
-                    for (int i = 1; isSquareValid({ move.x - i , move.y + i }) && getBoardPiece(model, { move.x - i , move.y + i }) != PIECE_EMPTY; i++)
-                        if (getBoardPiece(model, { move.x - i , move.y + i }) == selfPiece)
-                        {
-                            validMoves.push_back(move);
-                            flag = false;
-                        }
-
+                if (flag)
+                    validMoves.push_back(move);
             }
 
         }
@@ -202,143 +154,33 @@ bool playMove(GameModel &model, Square move)
         (getCurrentPlayer(model) == PLAYER_WHITE)
         ? PIECE_BLACK
         : PIECE_WHITE;
-    // To-do: your code goes here...
     
     Square auxSquare;
-    int difference = 0;
 
-    // Horizontal derecha
-    if (isSquareValid({ move.x + 1, move.y }) && getBoardPiece(model, { move.x + 1, move.y }) == pieceEnemy)
-    {
-        bool flag = true;
-        for (int i = move.x + 1; i < BOARD_SIZE && flag && getBoardPiece(model, { i, move.y }) != PIECE_EMPTY; i++)
-            if (isSquareValid({ i , move.y }) && getBoardPiece(model, { i, move.y }) == piece)
-            {
-                auxSquare = { i , move.y };
-                flag = false;
-            }
 
-        if (!flag)
-            for (int i = move.x; i <= auxSquare.x; i++)
-                setBoardPiece(model, { i, move.y }, piece);
-    }
+    if (analyseInDir(model, move, piece, -1, -1))
+        flipInDir(model, move, piece, -1, -1);
 
-    //horizontal izquierda
-    if (isSquareValid({ move.x - 1, move.y }) && getBoardPiece(model, { move.x - 1, move.y }) == pieceEnemy)
-    {
-        bool flag = true;
-        for (int i = move.x - 1; i >= 0 && flag && getBoardPiece(model, { i , move.y }) != PIECE_EMPTY ; i--)
-            if( isSquareValid({ i , move.y }) && getBoardPiece(model, { i, move.y }) == piece )
-            {
-                auxSquare = { i , move.y };
-                flag = false;
-            }
+    if (analyseInDir(model, move, piece, -1, 0))
+        flipInDir(model, move, piece, -1, 0);
 
-        if (!flag)
-            for (int i = move.x; i > auxSquare.x; i--)
-                setBoardPiece(model, { i, move.y }, piece);
+    if (analyseInDir(model, move, piece, -1, 1))
+        flipInDir(model, move, piece, -1, 1);
 
-    }
+    if (analyseInDir(model, move, piece, 0, -1))
+        flipInDir(model, move, piece, 0, -1);
+          
+    if (analyseInDir(model, move, piece, 0, 1))
+        flipInDir(model, move, piece, 0, 1);
 
-    //vertical abajo
-    if (isSquareValid({ move.x, move.y - 1 }) && getBoardPiece(model, { move.x , move.y - 1 }) == pieceEnemy)
-    {
-        bool flag = true;
-        for (int j = move.y - 1 ; j >= 0 && flag && getBoardPiece(model, { j , move.y - 1 }) != PIECE_EMPTY ; j--)
-            if( isSquareValid({ move.x , j }) && getBoardPiece(model, { move.x , j }) == piece )
-            {
-                auxSquare = { move.x , j };
-                flag = false;
-            }
+    if (analyseInDir(model, move, piece, 1, -1))
+        flipInDir(model, move, piece, 1, -1);
 
-        if (!flag)
-            for (int  j = move.y; j > auxSquare.y; j--)
-                setBoardPiece(model, { move.x, j }, piece);
-    }
+    if (analyseInDir(model, move, piece, 1, 0))
+        flipInDir(model, move, piece, 1, 0);
 
-    // Vertical arriba
-    if (isSquareValid({ move.x, move.y + 1 }) && getBoardPiece(model, { move.x, move.y + 1 }) == pieceEnemy)
-    {
-        bool flag = true;
-        for (int j = move.y + 1; j < BOARD_SIZE && flag && getBoardPiece(model, { move.x , j}) != PIECE_EMPTY; j++)
-            if (isSquareValid({ move.x , j }) && getBoardPiece(model, { move.x , j }) == piece)
-            {
-                auxSquare = { move.x , j };
-                flag = false;
-            }
-
-        if (!flag)
-            for (int j = move.y; j < auxSquare.y ; j++)
-                setBoardPiece(model, { move.x, j }, piece);
-        
-    }
-
-    // Diagonal arriba derecha
-    if (isSquareValid({ move.x + 1, move.y + 1 }) && getBoardPiece(model, { move.x + 1, move.y + 1 }) == pieceEnemy)
-    {
-        bool flag = true;
-        for (int i = 1; isSquareValid({ move.x + i , move.y + i }) && flag && getBoardPiece(model, { move.x + i , move.y + i }) != PIECE_EMPTY; i++)
-            if (getBoardPiece(model, { move.x + i , move.y + i }) == piece)
-            {
-                auxSquare = { move.x + i , move.y + i };
-                flag = false;
-            }
-
-        if (!flag)
-            for (int j = 0; move.x + j < auxSquare.x; j++)
-                setBoardPiece(model, { move.x + j, move.y + j }, piece);
-
-    }
-
-    // Diagonal arriba izquierda
-    if (isSquareValid({ move.x - 1, move.y + 1 }) && getBoardPiece(model, { move.x + 1, move.y + 1 }) == pieceEnemy)
-    {
-        bool flag = true;
-        for (int i = 1; isSquareValid({ move.x - i , move.y + i }) && flag && getBoardPiece(model, { move.x - i , move.y + i }) != PIECE_EMPTY; i++)
-            if (getBoardPiece(model, { move.x - i , move.y + i }) == piece)
-            {
-                auxSquare = { move.x - i , move.y + i };
-                flag = false;
-            }
-
-        if (!flag)
-            for (int j = 0; move.x - j < auxSquare.x; j++)
-                setBoardPiece(model, { move.x - j, move.y + j }, piece);
-    }
-
-    // Diagonal abajo derecha
-    if (isSquareValid({ move.x + 1, move.y - 1 }) && getBoardPiece(model, { move.x + 1, move.y - 1 }) == pieceEnemy)
-    {
-        bool flag = true;
-        for (int i = 1; isSquareValid({ move.x + i , move.y - i }) && flag && getBoardPiece(model, { move.x + i , move.y - i }) != PIECE_EMPTY; i++)
-            if (getBoardPiece(model, { move.x + i , move.y - i }) == piece)
-            {
-                auxSquare = { move.x + i , move.y - i };
-                flag = false;
-            }
-
-        if (!flag)
-            for (int j = 0; move.x + j < auxSquare.x; j++)
-                setBoardPiece(model, { move.x + j, move.y - j }, piece);
-
-    }
-    
-    // Diagonal abajo izquierda
-    if (isSquareValid({ move.x - 1, move.y - 1 }) && getBoardPiece(model, { move.x - 1, move.y - 1 }) == pieceEnemy)
-    {
-        bool flag = true;
-        for (int i = 1; isSquareValid({ move.x - i , move.y - i }) && flag && getBoardPiece(model, { move.x - i , move.y - i }) != PIECE_EMPTY; i++)
-            if (getBoardPiece(model, { move.x - i , move.y - i }) == piece)
-            {
-                auxSquare = { move.x - i , move.y - i };
-                flag = false;
-            }
-
-        if (!flag)
-            for (int j = 0; move.x - j < auxSquare.x; j++)
-                setBoardPiece(model, { move.x - j, move.y - j }, piece);
-
-    }
+    if (analyseInDir(model, move, piece, 1, 1))
+        flipInDir(model, move, piece, 1, 1);
 
     // Update timer
     double currentTime = GetTime();
@@ -360,3 +202,4 @@ bool playMove(GameModel &model, Square move)
 
     return true;
 }
+

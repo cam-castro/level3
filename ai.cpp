@@ -12,9 +12,24 @@
 
 Square getBestMove(GameModel &model)
 {
-    // To-do: your code goes here...
+    
 
+    /*Piece oppPiece =
+        (getCurrentPlayer(model) == PLAYER_WHITE)
+        ? PIECE_BLACK
+        : PIECE_WHITE;
+    Piece selfPiece =
+        (getCurrentPlayer(model) == PLAYER_WHITE)
+        ? PIECE_WHITE
+        : PIECE_BLACK;
 
+    Moves validMoves;
+
+    Tree root;
+    root.move = model;
+
+    getValidMoves(root.move, validMoves);*/
+    
 
     // +++ TEST
     // Returns a random valid move...
@@ -24,4 +39,20 @@ Square getBestMove(GameModel &model)
     int index = rand() % validMoves.size();
     return validMoves[index];
     // --- TEST
+    
+    
 }
+
+//void populateTree (Tree * arbol, GameModel * model, Moves validMoves)
+//{
+//    std::array<vector<Tree>, validMoves.size()> sons;
+//    if (validMoves.size() != 0)
+//    {
+//        for (auto i = validMoves.size() - 1; i >= 0; i--)
+//        {
+//
+//        }
+//
+//    }
+//
+//}
