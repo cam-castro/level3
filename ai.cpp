@@ -12,7 +12,8 @@
 
 void populateTree(Tree* father, Moves fatherValidMoves, int iterator)
 {
-    father->sons[iterator] = new Tree();
+    static int counter = 0;
+    father->sons.push_back(new Tree());
     Tree* thisNode = father->sons[iterator];
     thisNode->move = fatherValidMoves[iterator];
     thisNode->sim = father->sim;
@@ -25,16 +26,15 @@ void populateTree(Tree* father, Moves fatherValidMoves, int iterator)
                 ? PLAYER_BLACK
                 : PLAYER_WHITE;
     
-    if (thisNodeValidMoves.size() == 0)
+    if (thisNodeValidMoves.size() == 0 || counter == COTA_NIVELES)
     {
        thisNode->value = getScore(thisNode->sim, aiPlayer) - getScore(thisNode->sim, thisNode->sim.humanPlayer);
     }
     else
     {
+        counter++;
         for (int i = 0; i < thisNodeValidMoves.size(); i++)
-        {
             populateTree(thisNode, thisNodeValidMoves, i);
-        }
     }
 }
 
@@ -72,6 +72,21 @@ int functionMinMax(Tree * father)
     }
 }
 
+void freeTrees(Tree * node)
+{
+    if (node->sons.size() == 0) 
+    {
+        return;
+    }
+    for(auto i = 0 ; node->sons.size() > i ; i++)
+    {
+        freeTrees(node->sons[i]);
+    }
+
+    delete node;
+
+}
+
 Square getBestMove(GameModel &model)
 {
     Piece oppPiece =
@@ -93,7 +108,7 @@ Square getBestMove(GameModel &model)
     populateTree(&root, validMoves, 0);
 
     int minMax = -64;
-    Square bestMove;
+    Square bestMove = {0, 0};
 
     for (auto i = 0; i < root.sons.size(); i++)
     {
@@ -105,17 +120,9 @@ Square getBestMove(GameModel &model)
         }
     }
 
+    for (auto i = 0; i < root.sons.size(); i++)
+        freeTrees(root.sons[i]);
+    
     return bestMove;
-
-    
-    //// +++ TEST
-    //// Returns a random valid move...
-    //Moves validMoves;
-    //getValidMoves(model, validMoves);
-
-    //int index = rand() % validMoves.size();
-    //return validMoves[index];
-    //// --- TEST
-    
     
 }

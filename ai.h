@@ -10,6 +10,8 @@
 
 #include "model.h"
 
+#define COTA_NIVELES 75
+
 class Tree {
 public:
 	Square move;

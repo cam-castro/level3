@@ -2,7 +2,8 @@
 
 ## Integrantes del grupo y contribución al trabajo de cada integrante
 
-* [Nombre]: [contribución]
+* Camila Castro: [contribución]
+* Bautista Peri: []
 
 [completar]
 
