@@ -2,12 +2,12 @@
 
 ## Integrantes del grupo y contribución al trabajo de cada integrante
 
-* Camila Castro: Desarrollo de las funciones getValidMoves y getBestMoves con sus funciones auxiliares correspondientes.
-* Bautista Peri: Desarrollo de las funciones getValidMoves y getBestMoves con sus funciones auxiliares correspondientes.
+* Camila Castro: Desarrollo de las funciones playMove, getValidMoves y las correspondientes al archivo ai.cpp con sus funciones auxiliares correspondientes.
+* Bautista Peri: Desarrollo de las funciones playMove, getValidMoves y las correspondientes al archivo ai.cpp con sus funciones auxiliares correspondientes.
 
 ## Parte 1: Generación de movimientos válidos y algoritmo de jugada
 
-[Enumera aquí las pruebas que hiciste para validar que tu generador de movimientos válidos y algoritmo de jugada funcionan correctamente.]
+Para validar las jugadas se probó el algoritmo (utilizando el algoritmo aleatorio de la función dada por la catedra) con una inteligencia artificial de un juego de Reversi de Internet (link en documentación adicional).
 
 ## Parte 2: Implementación del motor de IA
 
