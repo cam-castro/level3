@@ -1,27 +1,24 @@
-/**
- * @brief Implements the Reversi game AI
- * @author Marc S. Ressl
- *
- * @copyright Copyright (c) 2023-2024
- */
-
 #include <cstdlib>
 #include <iostream>
 
 #include "ai.h"
+#include "view.h"
 #include "controller.h"
 
 static int counter = 0;
 
 void populateTree(Tree* father, Moves fatherValidMoves, int iterator)
 {
-    std::cout << counter << std::endl;
+    // Crea el enesimo nodo hijo
     father->sons.push_back(new Tree());
     Tree* thisNode = father->sons[iterator];
     thisNode->move = fatherValidMoves[iterator];
+
+    // Juega el movimiento válido en la simulación
     thisNode->sim = father->sim;
     playMove(thisNode->sim, thisNode->move);
 
+    // Busca todos los valid moves
     Moves thisNodeValidMoves;
     getValidMoves(thisNode->sim, thisNodeValidMoves);
     Player aiPlayer =
@@ -29,6 +26,7 @@ void populateTree(Tree* father, Moves fatherValidMoves, int iterator)
                 ? PLAYER_BLACK
                 : PLAYER_WHITE;
     
+    // ¿Es un nodo hoja, o el máximo de nodos?
     if (thisNodeValidMoves.size() == 0 || counter == COTA_NIVELES)
     {
        thisNode->value = getScore(thisNode->sim, aiPlayer) - getScore(thisNode->sim, thisNode->sim.humanPlayer);
@@ -49,6 +47,7 @@ int functionMinMax(Tree * father)
         ? PLAYER_BLACK
         : PLAYER_WHITE;
     
+    // ¿Es un nodo hoja?
     if (father->sons.size() == 0)
     {
         return father->value;
@@ -61,12 +60,13 @@ int functionMinMax(Tree * father)
         {
             int childValue = functionMinMax(father->sons[i]);
 
-            if (father->sim.currentPlayer == aiPlayer) //max
+            // Max
+            if (father->sim.currentPlayer == aiPlayer)
             {
                 if(minMaxVal < childValue)
                     minMaxVal = childValue;
             }
-            else //min
+            else
             {
                 if(minMaxVal > childValue)
                     minMaxVal = childValue;
@@ -78,6 +78,7 @@ int functionMinMax(Tree * father)
 
 void freeTrees(Tree * node)
 {
+    // ¿Tiene hijos para liberar?
     if (node->sons.size() == 0) 
     {
         counter = 0;
@@ -98,6 +99,7 @@ Square getBestMove(GameModel &model)
         (getCurrentPlayer(model) == PLAYER_WHITE)
         ? PIECE_BLACK
         : PIECE_WHITE;
+    
     Piece selfPiece =
         (getCurrentPlayer(model) == PLAYER_WHITE)
         ? PIECE_WHITE
@@ -105,13 +107,17 @@ Square getBestMove(GameModel &model)
 
     Moves validMoves;
 
+    // Genera el árbol
     Tree root;
     root.sim = model;
 
     getValidMoves(root.sim, validMoves);
 
     for(auto i = 0 ; i < validMoves.size() ; i++)
+    {
+        drawView(model);
         populateTree(&root, validMoves, i);
+    }
 
     int minMax = -64;
     Square bestMove = {0, 0};

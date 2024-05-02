@@ -10,14 +10,14 @@
 
 #include "model.h"
 
-#define COTA_NIVELES 1e6
+#define COTA_NIVELES 2500
 
 class Tree {
 public:
-	Square move;
-	GameModel sim;
-	int value;
-	std::vector<Tree *> sons;
+	Square move; // posición del movimiento hecho 
+	GameModel sim; // simulación del movimiento en el tablero correspondiente
+	int value; // diferencia entre las fichas de la ia y las fichas del humano 
+	std::vector<Tree *> sons; // nodos hijos
 };
 
 /**

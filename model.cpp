@@ -1,9 +1,3 @@
-/**
- * @brief Implements the Reversi game model
- * @author Marc S. Ressl
- *
- * @copyright Copyright (c) 2023-2024
- */
 
 #include "raylib.h"
 #include <array>
@@ -88,18 +82,20 @@ bool isSquareValid(Square square)
            (square.y < BOARD_SIZE);
 }
 
+// Analiza si hay una jugada válida en la dirección pedida
 bool analyseInDir(GameModel &model, Square square, Piece anPiece, const int dx, const int dy)
 {
     if ( isSquareValid({ square.x + dx, square.y + dy}) && getBoardPiece(model, { square.x + dx, square.y + dy }) != PIECE_EMPTY 
         && getBoardPiece(model, { square.x + dx, square.y + dy }) != anPiece)
         for ( int i = dx, j = dy; isSquareValid({ square.x + i , square.y + j }) && 
-                getBoardPiece(model, { square.x + dx, square.y + dy }) != PIECE_EMPTY ; i += dx, j+= dy )
+                getBoardPiece(model, { square.x + i, square.y + j }) != PIECE_EMPTY ; i += dx, j+= dy )
             if (getBoardPiece(model, { square.x + i , square.y + j }) == anPiece)
                 return true;
     
     return false;
 }
 
+// Cambia las piezas a toFlip en la dirección pedida hasta encontrar otra pieza toFlip
 void flipInDir(GameModel &model, Square square, Piece toFlip, int dx, int dy)
 {
     for ( int i = dx, j = dy; isSquareValid({ square.x + i , square.y + j }) && 
@@ -124,9 +120,10 @@ void getValidMoves(GameModel &model, Moves &validMoves)
         {
             Square move = { x, y }, auxMove = move;
 
-            // Lists all empty squares...
+            // Me fijo dónde están los lugares vacios del tablero
             if (getBoardPiece(model, move) == PIECE_EMPTY)
             {
+                // Indica si existe al menos una jugada valida
                 bool flag = analyseInDir(model, move, selfPiece, -1, -1) || analyseInDir(model, move, selfPiece, -1, 0) ||
                     analyseInDir(model, move, selfPiece, -1, 1) || analyseInDir(model, move, selfPiece, 0, -1) ||
                     analyseInDir(model, move, selfPiece, 0, 1) || analyseInDir(model, move, selfPiece, 1, -1) ||
@@ -157,7 +154,7 @@ bool playMove(GameModel &model, Square move)
     
     Square auxSquare;
 
-
+    // Analiza y cambia el color de las distintas jugadas posibles en esa posición (analiza las posiciones adyacentes)
     if (analyseInDir(model, move, piece, -1, -1))
         flipInDir(model, move, piece, -1, -1);
 
