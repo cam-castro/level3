@@ -6,13 +6,16 @@
  */
 
 #include <cstdlib>
+#include <iostream>
 
 #include "ai.h"
 #include "controller.h"
 
+static int counter = 0;
+
 void populateTree(Tree* father, Moves fatherValidMoves, int iterator)
 {
-    static int counter = 0;
+    std::cout << counter << std::endl;
     father->sons.push_back(new Tree());
     Tree* thisNode = father->sons[iterator];
     thisNode->move = fatherValidMoves[iterator];
@@ -29,6 +32,7 @@ void populateTree(Tree* father, Moves fatherValidMoves, int iterator)
     if (thisNodeValidMoves.size() == 0 || counter == COTA_NIVELES)
     {
        thisNode->value = getScore(thisNode->sim, aiPlayer) - getScore(thisNode->sim, thisNode->sim.humanPlayer);
+       
     }
     else
     {
@@ -76,6 +80,7 @@ void freeTrees(Tree * node)
 {
     if (node->sons.size() == 0) 
     {
+        counter = 0;
         return;
     }
     for(auto i = 0 ; node->sons.size() > i ; i++)
