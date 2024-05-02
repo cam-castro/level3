@@ -105,7 +105,8 @@ Square getBestMove(GameModel &model)
 
     getValidMoves(root.sim, validMoves);
 
-    populateTree(&root, validMoves, 0);
+    for(auto i = 0 ; i < validMoves.size() ; i++)
+        populateTree(&root, validMoves, i);
 
     int minMax = -64;
     Square bestMove = {0, 0};

@@ -10,7 +10,7 @@
 
 #include "model.h"
 
-#define COTA_NIVELES 75
+#define COTA_NIVELES 5
 
 class Tree {
 public:
