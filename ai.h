@@ -10,12 +10,13 @@
 
 #include "model.h"
 
-//class Tree {
-//public:
-//	Square move;
-//	GameModel sim;
-//	std::vector<Tree *> sons;
-//};
+class Tree {
+public:
+	Square move;
+	GameModel sim;
+	int value;
+	std::vector<Tree *> sons;
+};
 
 /**
  * @brief Returns the best move for a certain position.

@@ -10,11 +10,71 @@
 #include "ai.h"
 #include "controller.h"
 
+void populateTree(Tree* father, Moves fatherValidMoves, int iterator)
+{
+    father->sons[iterator] = new Tree();
+    Tree* thisNode = father->sons[iterator];
+    thisNode->move = fatherValidMoves[iterator];
+    thisNode->sim = father->sim;
+    playMove(thisNode->sim, thisNode->move);
+
+    Moves thisNodeValidMoves;
+    getValidMoves(thisNode->sim, thisNodeValidMoves);
+    Player aiPlayer =
+                (thisNode->sim.humanPlayer == PLAYER_WHITE)
+                ? PLAYER_BLACK
+                : PLAYER_WHITE;
+    
+    if (thisNodeValidMoves.size() == 0)
+    {
+       thisNode->value = getScore(thisNode->sim, aiPlayer) - getScore(thisNode->sim, thisNode->sim.humanPlayer);
+    }
+    else
+    {
+        for (int i = 0; i < thisNodeValidMoves.size(); i++)
+        {
+            populateTree(thisNode, thisNodeValidMoves, i);
+        }
+    }
+}
+
+int functionMinMax(Tree * father) 
+{
+    Player aiPlayer =
+        (father->sim.humanPlayer == PLAYER_WHITE)
+        ? PLAYER_BLACK
+        : PLAYER_WHITE;
+    
+    if (father->sons.size() == 0)
+    {
+        return father->value;
+    }
+    else
+    {
+        int result = 0;
+        int minMaxVal = (father->sim.currentPlayer == aiPlayer) ? -64 : 64; 
+        for (auto i = 0; father->sons.size() > i; i++)
+        {
+            int childValue = functionMinMax(father->sons[i]);
+
+            if (father->sim.currentPlayer == aiPlayer) //max
+            {
+                if(minMaxVal < childValue)
+                    minMaxVal = childValue;
+            }
+            else //min
+            {
+                if(minMaxVal > childValue)
+                    minMaxVal = childValue;
+            }
+        }
+        return minMaxVal;
+    }
+}
+
 Square getBestMove(GameModel &model)
 {
-    
-
-    /*Piece oppPiece =
+    Piece oppPiece =
         (getCurrentPlayer(model) == PLAYER_WHITE)
         ? PIECE_BLACK
         : PIECE_WHITE;
@@ -26,33 +86,36 @@ Square getBestMove(GameModel &model)
     Moves validMoves;
 
     Tree root;
-    root.move = model;
+    root.sim = model;
 
-    getValidMoves(root.move, validMoves);*/
+    getValidMoves(root.sim, validMoves);
+
+    populateTree(&root, validMoves, 0);
+
+    int minMax = -64;
+    Square bestMove;
+
+    for (auto i = 0; i < root.sons.size(); i++)
+    {
+        int sonVal= functionMinMax(root.sons[i]);
+        if (minMax < sonVal)
+        {
+            minMax = sonVal;
+            bestMove = root.sons[i]->move;
+        }
+    }
+
+    return bestMove;
+
     
+    //// +++ TEST
+    //// Returns a random valid move...
+    //Moves validMoves;
+    //getValidMoves(model, validMoves);
 
-    // +++ TEST
-    // Returns a random valid move...
-    Moves validMoves;
-    getValidMoves(model, validMoves);
-
-    int index = rand() % validMoves.size();
-    return validMoves[index];
-    // --- TEST
+    //int index = rand() % validMoves.size();
+    //return validMoves[index];
+    //// --- TEST
     
     
 }
-
-//void populateTree (Tree * arbol, GameModel * model, Moves validMoves)
-//{
-//    std::array<vector<Tree>, validMoves.size()> sons;
-//    if (validMoves.size() != 0)
-//    {
-//        for (auto i = validMoves.size() - 1; i >= 0; i--)
-//        {
-//
-//        }
-//
-//    }
-//
-//}
